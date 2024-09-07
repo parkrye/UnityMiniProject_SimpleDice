@@ -5,30 +5,31 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SimpleDice : MonoBehaviour
+public class DiceManager : MonoBehaviour
 {
-    [SerializeField] private RectTransform rect;
+    [SerializeField] private PopUp popUp = default;
+    [SerializeField] private RectTransform rect = default;
 
     [Space()]
-    [SerializeField] private TextMeshProUGUI timeText;
-    [SerializeField] private TextMeshProUGUI countText;
-    [SerializeField] private TMP_InputField diceInputField;
-    [SerializeField] private TMP_InputField descInputField;
-    [SerializeField] private TextMeshProUGUI descText;
-    [SerializeField] private TextMeshProUGUI descRealText;
+    [SerializeField] private TextMeshProUGUI timeText = default;
+    [SerializeField] private TextMeshProUGUI countText = default;
+    [SerializeField] private TMP_InputField diceInputField = default;
+    [SerializeField] private TMP_InputField descInputField = default;
+    [SerializeField] private TextMeshProUGUI descText = default;
+    [SerializeField] private TextMeshProUGUI descRealText = default;
 
     [Space()]
-    [SerializeField] private GameObject textTemplate;
-    [SerializeField] private RectTransform textContent;
-    [SerializeField] private RectTransform upperInputField;
+    [SerializeField] private GameObject textTemplate = default;
+    [SerializeField] private RectTransform textContent = default;
+    [SerializeField] private RectTransform upperInputField = default;
 
     [Space()]
-    [SerializeField] private GameObject slotTemplate;
-    [SerializeField] private RectTransform slotContent;
+    [SerializeField] private GameObject slotTemplate = default;
+    [SerializeField] private RectTransform slotContent = default;
 
     [Space()]
-    [SerializeField] private Color32[] colors;
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private Color32[] colors = default;
+    [SerializeField] private AudioSource audioSource = default;
 
     private List<GameObject> texts = new List<GameObject>();
     private int textIndex, slotIndex, textLine;
@@ -39,7 +40,8 @@ public class SimpleDice : MonoBehaviour
 
     private void Awake()
     {
-        logData = DataHelper.LoadData();
+        if (DataHelper.TryLoadData(out logData) == false)
+            popUp.ShowNotice("Failt to Load Log Data!!", 3f);
 
         descInputField.onValueChanged.AddListener(ResizeDescInputFieldSize);
     }
@@ -85,11 +87,6 @@ public class SimpleDice : MonoBehaviour
     private void Update()
     {
         timeText.text = DateTime.Now.ToString("HH:mm:ss");
-    }
-
-    private void OnApplicationQuit()
-    {
-        DataHelper.SaveData(logData);
     }
 
     public void DiceRoll(TMP_InputField field)
@@ -201,5 +198,13 @@ public class SimpleDice : MonoBehaviour
             this.textLine = textLine;
             upperInputField.sizeDelta = Vector2.up * MathF.Max(180f, textLine * 150f);
         }
+    }
+
+    public void OnClickedQuitbutton()
+    {
+        if (DataHelper.TrySaveData(logData) == false)
+            popUp.ShowNotice("Failt to Load Log Data!!", 3f);
+        else
+            Application.Quit();
     }
 }
